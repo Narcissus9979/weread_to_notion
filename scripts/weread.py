@@ -104,7 +104,10 @@ def check(bookId):
     response = client.databases.query(database_id=database_id, filter=filter)
     for result in response["results"]:
         time.sleep(0.3)
-        client.blocks.delete(block_id=result["id"])
+        try:
+            client.blocks.delete(block_id=result["id"])
+        except Exception as e:
+            print(f"删除块时出错: {e}")
 
 
 def get_chapter_info(bookId):
@@ -125,6 +128,8 @@ def get_chapter_info(bookId):
 def insert_to_notion(bookName, bookId, cover, sort, author, isbn, rating, categories):
     """插入到notion"""
     time.sleep(0.3)
+    if not cover or not cover.startswith("http"):
+        cover = "https://www.notion.so/icons/book_gray.svg"
     parent = {"database_id": database_id, "type": "database_id"}
     properties = {
         "BookName": get_title(bookName),
